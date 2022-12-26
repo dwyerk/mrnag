@@ -35,6 +35,7 @@ class MergeRequest:
     """Represents metadata about a merge/pull request."""
     title: str
     author: str
+    author_username: str
     created_at: datetime
     updated_at: datetime
     approvals: MergeRequestApprovals = field(default_factory=MergeRequestApprovals, init=False)
@@ -44,6 +45,7 @@ class MergeRequest:
     merge_request_id: int = None
     url: str = None
     assignees: List[str] = field(default_factory=list, init=False)
+    reviewers: List[str] = field(default_factory=list, init=False)
 
 
 @dataclass
@@ -147,6 +149,7 @@ class Gitlab(Forge):
             merge_request: MergeRequest = MergeRequest(
                 mr['title'],
                 mr.get('author', {}).get('name'),
+                mr.get('author', {}).get('username'),
                 timestamp_to_datetime(mr['created_at'], tz='utc'),
                 timestamp_to_datetime(mr['updated_at'], tz='utc'),
                 mr['labels'],
@@ -157,6 +160,9 @@ class Gitlab(Forge):
 
             for assignee in mr.get('assignees', []):
                 merge_request.assignees.append(assignee.get('username'))
+
+            for reviewer in mr.get('reviewers', []):
+                merge_request.reviewers.append(reviewer.get('username'))
 
             resp = self.session.get(
                 f'{self.api_url}/projects/{project.project_id}/merge_requests/{mr["iid"]}/approvals'

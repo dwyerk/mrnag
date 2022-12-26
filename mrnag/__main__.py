@@ -33,8 +33,8 @@ def csv_formatter(projects: Iterable[Project]) -> None:
 
     :param projects: An iterable collections of projects.
     """
-    headers = ['Name', 'Title', 'Author', 'Created', 'Last Updated', 'Total Approvals', 'Required Approvals',
-               'Comments', 'WIP', 'Labels', 'Assignees']
+    headers = ['Name', 'Title', 'Author', 'Username', 'Created', 'Last Updated', 'Total Approvals', 'Required Approvals',
+               'Comments', 'WIP', 'Labels', 'Assignees', 'Reviewers']
     csv_writer = csv.writer(sys.stdout)
 
     csv_writer.writerow(headers)
@@ -44,6 +44,7 @@ def csv_formatter(projects: Iterable[Project]) -> None:
                 project.name,
                 mr.title,
                 mr.author,
+                mr.author_username,
                 mr.created_at,
                 mr.updated_at,
                 mr.approvals.count,
@@ -51,7 +52,8 @@ def csv_formatter(projects: Iterable[Project]) -> None:
                 mr.comment_count,
                 mr.wip,
                 ','.join(mr.labels or []),
-                ','.join(mr.assignees or [])
+                ','.join(mr.assignees or []),
+                ','.join(mr.reviewers or [])
             ])
 
 
